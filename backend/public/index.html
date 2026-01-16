@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Notes - EduTech Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📚 AI-Powered Notes</h1>
+            <p class="subtitle">Take smarter notes while learning</p>
+        </header>
+
+        <!-- Video Section -->
+        <section class="video-section">
+            <h2>Add YouTube Video</h2>
+            <div class="input-group">
+                <input type="text" id="videoUrl" placeholder="Paste YouTube URL here..." />
+                <button onclick="loadVideo()" class="btn-primary">Load Video</button>
+            </div>
+            
+            <div id="videoContainer" class="video-container hidden">
+                <iframe id="videoPlayer" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- Notes Section -->
+        <section class="notes-section">
+            <div class="notes-header">
+                <h2>Your Notes</h2>
+                <button onclick="toggleAIFeatures()" class="btn-secondary" id="aiToggle">
+                    Enable AI Features
+                </button>
+            </div>
+
+            <!-- AI API Key Input (hidden by default) -->
+            <div id="apiKeySection" class="api-key-section hidden">
+                <input type="password" id="apiKey" placeholder="Enter Anthropic API Key (optional)" />
+                <button onclick="saveApiKey()" class="btn-small">Save Key</button>
+                <p class="hint">API key is stored locally and used for AI features</p>
+            </div>
+
+            <!-- Notes Input -->
+            <div class="notes-input">
+                <input type="text" id="noteTitle" placeholder="Note Title (auto-generated if empty)" />
+                <input type="text" id="noteTopic" placeholder="Topic (optional)" />
+                <textarea id="noteText" placeholder="Take your notes here... Write quickly, AI will enhance them later!" rows="10"></textarea>
+                
+                <div class="notes-actions">
+                    <button onclick="saveNote()" class="btn-primary">💾 Save Note</button>
+                    <button onclick="enhanceNote()" class="btn-ai" id="enhanceBtn" disabled>✨ AI Enhance</button>
+                    <button onclick="clearNotes()" class="btn-secondary">🗑️ Clear</button>
+                </div>
+            </div>
+
+            <!-- Enhanced Notes Display -->
+            <div id="enhancedSection" class="enhanced-section hidden">
+                <h3>✨ Enhanced Notes</h3>
+                <div id="enhancedText" class="enhanced-text"></div>
+                <button onclick="copyEnhanced()" class="btn-small">📋 Copy to Clipboard</button>
+            </div>
+
+            <!-- Word Lookup -->
+            <div class="word-lookup">
+                <h3>📖 Word Meaning Lookup</h3>
+                <div class="input-group">
+                    <input type="text" id="lookupWord" placeholder="Enter word to lookup..." />
+                    <button onclick="lookupWord()" class="btn-secondary">Search</button>
+                </div>
+                <div id="wordMeaning" class="word-meaning hidden"></div>
+            </div>
+        </section>
+
+        <!-- Saved Notes List -->
+        <section class="saved-notes">
+            <h2>Saved Notes</h2>
+            <div id="notesList" class="notes-list">
+                <p class="empty-state">No notes yet. Start taking notes above!</p>
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section class="feedback-section">
+            <h2>💬 Send Feedback</h2>
+            <form onsubmit="submitFeedback(event)">
+                <textarea id="feedbackMessage" placeholder="Share your thoughts about the platform..." rows="4" required></textarea>
+                <div class="rating">
+                    <label>Rating:</label>
+                    <select id="feedbackRating">
+                        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ Good</option>
+                        <option value="3" selected>⭐⭐⭐ Average</option>
+                        <option value="2">⭐⭐ Poor</option>
+                        <option value="1">⭐ Very Poor</option>
+                    </select>
+                </div>
+                <input type="email" id="feedbackEmail" placeholder="Your email (optional)" />
+                <button type="submit" class="btn-primary">Send Feedback</button>
+            </form>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 EduTech Platform | Powered by AI</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
