@@ -37,3 +37,4 @@ build/
 # Testing
 coverage/
 .nyc_output/
+github-sa-key.json
