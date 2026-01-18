@@ -1,0 +1,11 @@
+project_id          = "ai-notes-app-484423"
+region              = "us-central1"
+
+database_name       = "ai_notes_db"
+database_user       = "ai_notes_user"
+database_password   = "topgrep@1234"
+
+db_tier             = "db-f1-micro"
+
+anthropic_api_key   = ""
+deletion_protection = false

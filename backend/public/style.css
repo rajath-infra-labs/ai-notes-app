@@ -1,316 +1,387 @@
-// API Base URL
-const API_URL = window.location.origin + '/api/notes';
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-// State
-let currentVideoId = null;
-let currentNoteId = null;
-let apiKey = localStorage.getItem('anthropic_api_key');
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadSavedNotes();
-    if (apiKey) {
-        document.getElementById('enhanceBtn').disabled = false;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+section {
+    padding: 30px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+h3 {
+    color: #555;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+/* Video Section */
+.video-section {
+    background: #f9f9f9;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.video-container {
+    margin-top: 20px;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Notes Section */
+.notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.api-key-section {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.api-key-section input {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.notes-input input,
+.notes-input textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    margin-bottom: 15px;
+}
+
+.notes-input input:focus,
+.notes-input textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.notes-input textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.notes-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-ai,
+.btn-small {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-ai {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-ai:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+}
+
+.btn-ai:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-small {
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-small:hover {
+    background: #218838;
+}
+
+/* Enhanced Section */
+.enhanced-section {
+    background: #f0f8ff;
+    border: 2px solid #667eea;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.enhanced-text {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    line-height: 1.8;
+    color: #333;
+}
+
+.enhanced-text h1,
+.enhanced-text h2,
+.enhanced-text h3 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.enhanced-text li {
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
+/* Word Lookup */
+.word-lookup {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.word-meaning {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border-left: 4px solid #667eea;
+}
+
+/* Saved Notes */
+.notes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.note-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.note-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.note-card h4 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.note-topic {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.note-date,
+.note-video {
+    color: #666;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Feedback Section */
+.feedback-section form {
+    max-width: 600px;
+}
+
+.feedback-section textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: inherit;
+    margin-bottom: 15px;
+    resize: vertical;
+}
+
+.feedback-section input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.rating {
+    margin-bottom: 15px;
+}
+
+.rating label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.rating select {
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Footer */
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2em;
     }
-});
-
-// Load video
-function loadVideo() {
-    const url = document.getElementById('videoUrl').value.trim();
-    if (!url) {
-        alert('Please enter a YouTube URL');
-        return;
-    }
-
-    const videoId = extractVideoId(url);
-    if (!videoId) {
-        alert('Invalid YouTube URL');
-        return;
-    }
-
-    currentVideoId = videoId;
-    const container = document.getElementById('videoContainer');
-    const player = document.getElementById('videoPlayer');
     
-    player.src = `https://www.youtube.com/embed/${videoId}`;
-    container.classList.remove('hidden');
-
-    // Fetch subtitles for context
-    fetchSubtitles(url);
-}
-
-function extractVideoId(url) {
-    const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-        /youtube\.com\/embed\/([^&\n?#]+)/
-    ];
-
-    for (const pattern of patterns) {
-        const match = url.match(pattern);
-        if (match && match[1]) return match[1];
+    .notes-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
-    return null;
-}
-
-async function fetchSubtitles(url) {
-    try {
-        const response = await fetch(`${API_URL}/video/subtitles?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
-        
-        if (data.subtitles && data.subtitles.text) {
-            console.log('Subtitles loaded for AI context');
-        }
-    } catch (error) {
-        console.error('Failed to fetch subtitles:', error);
-    }
-}
-
-// Save note
-async function saveNote() {
-    const title = document.getElementById('noteTitle').value.trim();
-    const topic = document.getElementById('noteTopic').value.trim();
-    const rawText = document.getElementById('noteText').value.trim();
-    const videoUrl = document.getElementById('videoUrl').value.trim();
-
-    if (!rawText) {
-        alert('Please write some notes first');
-        return;
-    }
-
-    const noteData = {
-        userId: 1,
-        videoUrl: videoUrl || 'https://youtube.com/watch?v=demo',
-        title: title || 'Quick Notes',
-        topic: topic,
-        rawText: rawText
-    };
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(noteData)
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            currentNoteId = result.note.id;
-            alert('Note saved successfully!');
-            loadSavedNotes();
-        }
-    } catch (error) {
-        console.error('Failed to save note:', error);
-        alert('Failed to save note. Please try again.');
-    }
-}
-
-// Enhance note with AI
-async function enhanceNote() {
-    const rawText = document.getElementById('noteText').value.trim();
     
-    if (!rawText) {
-        alert('Please write some notes first');
-        return;
+    .notes-actions {
+        flex-direction: column;
     }
-
-    if (!currentNoteId) {
-        alert('Please save the note first');
-        return;
-    }
-
-    const enhanceBtn = document.getElementById('enhanceBtn');
-    enhanceBtn.disabled = true;
-    enhanceBtn.textContent = '⏳ Enhancing...';
-
-    try {
-        const response = await fetch(`${API_URL}/${currentNoteId}/enhance`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-API-Key': apiKey || ''
-            },
-            body: JSON.stringify({
-                rawText: rawText,
-                videoContext: document.getElementById('noteTopic').value
-            })
-        });
-
-        const result = await response.json();
-        
-        if (result.success) {
-            const enhancedSection = document.getElementById('enhancedSection');
-            const enhancedText = document.getElementById('enhancedText');
-            
-            enhancedText.innerHTML = formatMarkdown(result.enhancedText);
-            enhancedSection.classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error('Failed to enhance note:', error);
-        alert('Failed to enhance note. Please try again.');
-    } finally {
-        enhanceBtn.disabled = false;
-        enhanceBtn.textContent = '✨ AI Enhance';
-    }
-}
-
-// Lookup word meaning
-async function lookupWord() {
-    const word = document.getElementById('lookupWord').value.trim();
-    const context = document.getElementById('noteText').value.trim();
-
-    if (!word) {
-        alert('Please enter a word to lookup');
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/word-meaning`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-API-Key': apiKey || ''
-            },
-            body: JSON.stringify({ word, context })
-        });
-
-        const result = await response.json();
-        
-        const meaningDiv = document.getElementById('wordMeaning');
-        meaningDiv.innerHTML = formatMarkdown(result.meaning);
-        meaningDiv.classList.remove('hidden');
-    } catch (error) {
-        console.error('Failed to lookup word:', error);
-        alert('Failed to lookup word. Please try again.');
-    }
-}
-
-// Load saved notes
-async function loadSavedNotes() {
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        
-        const notesList = document.getElementById('notesList');
-        
-        if (data.notes && data.notes.length > 0) {
-            notesList.innerHTML = data.notes.map(note => `
-                <div class="note-card" onclick="viewNote(${note.id})">
-                    <h4>${note.title || 'Untitled Note'}</h4>
-                    <p class="note-topic">${note.topic || 'No topic'}</p>
-                    <p class="note-date">${new Date(note.created_at).toLocaleDateString()}</p>
-                    <p class="note-video">${note.video_title || 'No video'}</p>
-                </div>
-            `).join('');
-        } else {
-            notesList.innerHTML = '<p class="empty-state">No notes yet. Start taking notes above!</p>';
-        }
-    } catch (error) {
-        console.error('Failed to load notes:', error);
-    }
-}
-
-// View specific note
-async function viewNote(noteId) {
-    try {
-        const response = await fetch(`${API_URL}/${noteId}`);
-        const data = await response.json();
-        
-        if (data.note) {
-            document.getElementById('noteTitle').value = data.note.title || '';
-            document.getElementById('noteTopic').value = data.note.topic || '';
-            
-            if (data.versions && data.versions.length > 0) {
-                const latestVersion = data.versions[0];
-                document.getElementById('noteText').value = latestVersion.raw_text || '';
-                
-                if (latestVersion.ai_text) {
-                    const enhancedSection = document.getElementById('enhancedSection');
-                    const enhancedText = document.getElementById('enhancedText');
-                    enhancedText.innerHTML = formatMarkdown(latestVersion.ai_text);
-                    enhancedSection.classList.remove('hidden');
-                }
-            }
-            
-            if (data.note.video_url) {
-                document.getElementById('videoUrl').value = data.note.video_url;
-            }
-            
-            currentNoteId = noteId;
-            window.scrollTo(0, 0);
-        }
-    } catch (error) {
-        console.error('Failed to load note:', error);
-    }
-}
-
-// Submit feedback
-async function submitFeedback(event) {
-    event.preventDefault();
     
-    const message = document.getElementById('feedbackMessage').value.trim();
-    const rating = document.getElementById('feedbackRating').value;
-    const email = document.getElementById('feedbackEmail').value.trim();
-
-    try {
-        const response = await fetch(`${API_URL}/feedback`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, rating, email })
-        });
-
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Thank you for your feedback!');
-            document.getElementById('feedbackMessage').value = '';
-            document.getElementById('feedbackEmail').value = '';
-        }
-    } catch (error) {
-        console.error('Failed to submit feedback:', error);
-        alert('Failed to submit feedback. Please try again.');
+    .notes-actions button {
+        width: 100%;
     }
-}
-
-// Utility functions
-function toggleAIFeatures() {
-    const section = document.getElementById('apiKeySection');
-    section.classList.toggle('hidden');
-}
-
-function saveApiKey() {
-    const key = document.getElementById('apiKey').value.trim();
-    if (key) {
-        localStorage.setItem('anthropic_api_key', key);
-        apiKey = key;
-        document.getElementById('enhanceBtn').disabled = false;
-        alert('API key saved! AI features are now enabled.');
+    
+    .notes-list {
+        grid-template-columns: 1fr;
     }
-}
-
-function clearNotes() {
-    if (confirm('Clear all notes? This will not delete saved notes.')) {
-        document.getElementById('noteTitle').value = '';
-        document.getElementById('noteTopic').value = '';
-        document.getElementById('noteText').value = '';
-        document.getElementById('enhancedSection').classList.add('hidden');
-        currentNoteId = null;
-    }
-}
-
-function copyEnhanced() {
-    const text = document.getElementById('enhancedText').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Enhanced notes copied to clipboard!');
-    });
-}
-
-function formatMarkdown(text) {
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^- (.*$)/gim, '<li>$1</li>')
-        .replace(/\n/g, '<br>');
 }
