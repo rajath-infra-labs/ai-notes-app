@@ -115,6 +115,11 @@ resource "google_cloud_run_service" "app" {
         }
         
         env {
+          name  = "port"
+          value = "3000"
+        }
+
+        env {
           name  = "NODE_ENV"
           value = "production"
         }
