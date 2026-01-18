@@ -38,3 +38,4 @@ build/
 coverage/
 .nyc_output/
 github-sa-key.json
+github-sa-key.json
